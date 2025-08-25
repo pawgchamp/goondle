@@ -143,54 +143,58 @@
     ];
 
     let score = 0;
-    let pair = [];
+  let pair = [];
 
-    const format = n => n.toLocaleString('en-US');
+  const format = n => n.toLocaleString('en-US');
 
-    function pickTwo() {
-      const shuffled = [...dataset].sort(() => 0.5 - Math.random());
-      return [shuffled[0], shuffled[1]];
-    }
+  function pickTwo() {
+    const shuffled = [...dataset].sort(() => 0.5 - Math.random());
+    return [shuffled[0], shuffled[1]];
+  }
 
-    function renderRound() {
-      pair = pickTwo();
-      const choices = document.getElementById('choices');
-      choices.innerHTML = '';
-      pair.forEach((char, idx) => {
-        const btn = document.createElement('button');
-        btn.textContent = char.name;
-        btn.className = 'w-full bg-white/20 hover:bg-white/30 rounded-md p-4 text-lg transition';
-        btn.dataset.index = idx;
-        btn.onclick = handleGuess;
-        choices.appendChild(btn);
-      });
-      document.getElementById('result').textContent = '';
-      document.getElementById('nextBtn').classList.add('hidden');
-    }
+  function renderRound() {
+    pair = pickTwo();
+    const choices = document.getElementById('choices');
+    choices.innerHTML = '';
+    pair.forEach((char, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = char.name;
+      btn.dataset.index = idx;
+      btn.className = 'w-full bg-white/20 hover:bg-white/30 rounded-md p-4 text-lg transition';
+      btn.onclick = handleGuess;
+      choices.appendChild(btn);
+    });
+    document.getElementById('result').textContent = '';
+    document.getElementById('nextBtn').classList.add('hidden');
+  }
 
-    function handleGuess(e) {
-      const [a, b] = pair;
-      const chosen = pair[e.target.dataset.index];
-      const higher = a.rank > b.rank ? a : b;
-      const correct = chosen === higher;
+  function handleGuess(e) {
+    const [a, b] = pair;
+    const chosen = pair[e.target.dataset.index];
+    const higher = a.rank > b.rank ? a : b;
+    const correct = chosen === higher;
 
-      const resultDiv = document.getElementById('result');
-      const chosenName = chosen.name;
-      resultDiv.innerHTML = `
-        ${chosenName} <span class="font-bold">${correct ? 'won' : 'lost'}</span><br>
-        ${correct ? '✅' : '❌'}
-      `;
-      resultDiv.classList.add('fade-in');
+    // show ranks inside buttons
+    document.querySelectorAll('#choices button').forEach((btn, i) => {
+      btn.disabled = true;
+      btn.textContent = `${pair[i].name} – ${format(pair[i].rank)}`;
+    });
 
-      if (correct) score++;
-      document.getElementById('score').textContent = score;
+    // result text with emoji on new line
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = `${correct ? '✅' : '❌'}<br><span class="text-lg">${chosen.name} ${
+      correct ? 'won' : 'lost'
+    }</span>`;
+    resultDiv.classList.add('fade-in');
 
-      document.querySelectorAll('#choices button').forEach(btn => btn.disabled = true);
-      document.getElementById('nextBtn').classList.remove('hidden');
-    }
+    if (correct) score++;
+    document.getElementById('score').textContent = score;
 
-    document.getElementById('nextBtn').onclick = () => renderRound();
-    renderRound();
+    document.getElementById('nextBtn').classList.remove('hidden');
+  }
+
+  document.getElementById('nextBtn').onclick = () => renderRound();
+  renderRound();
   </script>
 </body>
 </html>
