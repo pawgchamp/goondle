@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Goondle – Who takes more loads?</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 flex flex-col items-center justify-center text-white font-sans p-4">
+  <h1 class="text-5xl font-bold mb-2">Goondle</h1>
+  <p class="text-lg mb-6">Which character has taken <strong>more loads</strong>?</p>
+
+  <div id="game" class="w-full max-w-md bg-white/10 backdrop-blur-md rounded-xl p-6 shadow-2xl">
+    <div id="choices" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <!-- Buttons injected here -->
+    </div>
+    <div id="result" class="text-center text-2xl mb-4 h-8"></div>
+    <div class="text-center mb-4">
+      <button id="nextBtn" class="hidden bg-white/20 hover:bg-white/30 rounded-md px-4 py-2 transition">Next Round</button>
+    </div>
+    <div class="text-center text-xl font-semibold">Score: <span id="score">0</span></div>
+  </div>
+
+  <script>
+    // ---------- Data ----------
+    const dataset = [
+      {"id":1,"name":"francine smith","rank":805924},
+      {"id":2,"name":"lisa simpson","rank":753355},
+      {"id":3,"name":"meg griffin","rank":716456},
+      {"id":4,"name":"marge simpson","rank":703527},
+      {"id":5,"name":"hayley smith","rank":671836},
+      {"id":6,"name":"lois griffin","rank":643240},
+      {"id":7,"name":"amy wong","rank":513281},
+      {"id":8,"name":"donna tubbs","rank":461702},
+      {"id":9,"name":"louise belcher","rank":435972},
+      {"id":10,"name":"princess tiabeanie","rank":398468},
+      {"id":11,"name":"maggie simpson","rank":394092},
+      {"id":12,"name":"tina belcher","rank":382178},
+      {"id":13,"name":"jessica lovejoy","rank":378861},
+      {"id":14,"name":"roberta tubbs","rank":345016},
+      {"id":15,"name":"turanga leela","rank":342886},
+      {"id":16,"name":"jessica rabbit","rank":342805},
+      {"id":17,"name":"betty boop","rank":342768},
+      {"id":18,"name":"princess jasmine","rank":342740},
+      {"id":19,"name":"linda belcher","rank":340817},
+      {"id":20,"name":"no_character_tagged","rank":336049},
+      {"id":21,"name":"original character","rank":117209},
+      {"id":22,"name":"elon musk","rank":112175},
+      {"id":23,"name":"princess peach","rank":108655},
+      {"id":24,"name":"princess rosalina","rank":107890},
+      {"id":25,"name":"samus aran","rank":106303},
+      {"id":26,"name":"princess zelda","rank":87855},
+      {"id":27,"name":"luma","rank":87752},
+      {"id":28,"name":"d.va","rank":65304},
+      {"id":29,"name":"tracer","rank":65159},
+      {"id":30,"name":"pokémon (species)","rank":62760},
+      {"id":31,"name":"robloxian","rank":57659},
+      {"id":32,"name":"palutena","rank":53937},
+      {"id":33,"name":"doge","rank":53299},
+      {"id":34,"name":"widowmaker","rank":52067},
+      {"id":35,"name":"summer smith","rank":50702},
+      {"id":36,"name":"pokemon (species)","rank":50078},
+      {"id":37,"name":"wii fit trainer","rank":49221},
+      {"id":38,"name":"jake the dog","rank":48536},
+      {"id":39,"name":"mercy","rank":45620},
+      {"id":40,"name":"beth smith","rank":44671},
+      {"id":41,"name":"robin (fire emblem)","rank":43814},
+      {"id":42,"name":"selma bouvier","rank":43728},
+      {"id":43,"name":"patty bouvier","rank":43718},
+      {"id":44,"name":"link","rank":41056},
+      {"id":45,"name":"yorha 2b","rank":40754},
+      {"id":46,"name":"azula","rank":38320},
+      {"id":47,"name":"mabel pines","rank":36994},
+      {"id":48,"name":"ahri","rank":35546},
+      {"id":49,"name":"tifa lockhart","rank":35460},
+      {"id":50,"name":"astolfo (fate)","rank":31206},
+      {"id":51,"name":"sakura haruno","rank":30370},
+      {"id":52,"name":"hyuuga hinata","rank":30289},
+      {"id":53,"name":"katara","rank":30128},
+      {"id":54,"name":"kimberly ann possible","rank":29892},
+      {"id":55,"name":"ann possible","rank":29417},
+      {"id":56,"name":"korra","rank":28388},
+      {"id":57,"name":"pacifica northwest","rank":27790},
+      {"id":58,"name":"hatsune miku","rank":27789},
+      {"id":59,"name":"uzumaki naruto","rank":27494},
+      {"id":60,"name":"gardevoir","rank":27048},
+      {"id":61,"name":"molly mcgee","rank":26545},
+      {"id":62,"name":"mei (overwatch)","rank":26028},
+      {"id":63,"name":"oc","rank":26027},
+      {"id":64,"name":"girlfriend (friday night funkin)","rank":25606},
+      {"id":65,"name":"gwen tennyson","rank":25284},
+      {"id":66,"name":"wendy corduroy","rank":24372},
+      {"id":67,"name":"nico robin","rank":24037},
+      {"id":68,"name":"donald trump","rank":23969},
+      {"id":69,"name":"ty lee","rank":23379},
+      {"id":70,"name":"aether (genshin impact)","rank":23264},
+      {"id":71,"name":"libby stein-torres","rank":23065},
+      {"id":72,"name":"ochako uraraka","rank":22770},
+      {"id":73,"name":"amy rose","rank":22738},
+      {"id":74,"name":"izuku midoriya","rank":21912},
+      {"id":75,"name":"draenei","rank":21821},
+      {"id":76,"name":"lara croft","rank":21599},
+      {"id":77,"name":"inkling","rank":21346},
+      {"id":78,"name":"anon","rank":21306},
+      {"id":79,"name":"andrea davenport","rank":20929},
+      {"id":80,"name":"mia abara","rank":20800},
+      {"id":81,"name":"rainbow dash (mlp)","rank":20786},
+      {"id":82,"name":"chun-li","rank":20407},
+      {"id":83,"name":"pharah","rank":20393},
+      {"id":84,"name":"kimberly harris","rank":20232},
+      {"id":85,"name":"harley quinn","rank":20149},
+      {"id":86,"name":"princess daisy","rank":20101},
+      {"id":87,"name":"renamon","rank":19959},
+      {"id":88,"name":"marie rose","rank":19869},
+      {"id":89,"name":"character request","rank":19793},
+      {"id":90,"name":"annie harris","rank":19690},
+      {"id":91,"name":"a_h","rank":19672},
+      {"id":92,"name":"toph bei fong","rank":19533},
+      {"id":93,"name":"erza scarlet","rank":19177},
+      {"id":94,"name":"rouge the bat","rank":19032},
+      {"id":95,"name":"tsunade","rank":18951},
+      {"id":96,"name":"roblox avatar","rank":18909},
+      {"id":97,"name":"eeveelution","rank":18767},
+      {"id":98,"name":"ellie rose","rank":18333},
+      {"id":99,"name":"twilight sparkle (mlp)","rank":18325},
+      {"id":100,"name":"boyfriend (friday night funkin)","rank":17977}
+    ];
+
+    // ---------- State ----------
+    let score = 0;
+    let pair = [];
+
+    // ---------- Helpers ----------
+    function pickTwo() {
+      const shuffled = [...dataset].sort(() => 0.5 - Math.random());
+      return [shuffled[0], shuffled[1]];
+    }
+
+    function renderRound() {
+      pair = pickTwo();
+      const choices = document.getElementById('choices');
+      choices.innerHTML = '';
+      pair.forEach((char, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = char.name;
+        btn.className = 'w-full bg-white/20 hover:bg-white/30 rounded-md p-4 text-lg transition';
+        btn.dataset.index = idx;
+        btn.onclick = handleGuess;
+        choices.appendChild(btn);
+      });
+      document.getElementById('result').textContent = '';
+      document.getElementById('nextBtn').classList.add('hidden');
+    }
+
+    function handleGuess(e) {
+      const [a, b] = pair;
+      const chosen = pair[e.target.dataset.index];
+      const higher = a.rank > b.rank ? a : b;
+      const correct = chosen === higher;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = `${correct ? '✅' : '❌'} ${a.name} (${a.rank}) vs ${b.name} (${b.rank})`;
+      resultDiv.classList.add('fade-in');
+
+      if (correct) score++;
+      document.getElementById('score').textContent = score;
+
+      // Disable buttons
+      document.querySelectorAll('#choices button').forEach(btn => btn.disabled = true);
+
+      document.getElementById('nextBtn').classList.remove('hidden');
+    }
+
+    // ---------- Init ----------
+    document.getElementById('nextBtn').onclick = () => {
+      renderRound();
+    };
+    renderRound();
+  </script>
+</body>
+</html>
