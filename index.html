@@ -5,12 +5,10 @@
   <title>Goondle – Who takes more loads?</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .fade-in {
-      animation: fadeIn 0.4s ease-in-out;
-    }
+    .fade-in { animation: fadeIn 0.4s ease-in-out; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      to   { opacity: 1; transform: translateY(0);   }
     }
   </style>
 </head>
@@ -19,18 +17,28 @@
   <p class="text-lg mb-6">Which character has taken <strong>more loads</strong>?</p>
 
   <div id="game" class="w-full max-w-md bg-white/10 backdrop-blur-md rounded-xl p-6 shadow-2xl">
-    <div id="choices" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div id="choices" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- Buttons injected here -->
     </div>
-    <div id="result" class="text-center text-2xl mb-4 h-8"></div>
-    <div class="text-center mb-4">
-      <button id="nextBtn" class="hidden bg-white/20 hover:bg-white/30 rounded-md px-4 py-2 transition">Next Round</button>
+
+    <!-- Result area -->
+    <div id="result" class="text-center text-2xl mt-6 h-12"></div>
+
+    <!-- Spacer so Next Round never overlaps -->
+    <div class="h-8"></div>
+
+    <div class="text-center">
+      <button id="nextBtn" class="hidden bg-white/20 hover:bg-white/30 rounded-md px-4 py-2 transition">
+        Next Round
+      </button>
     </div>
-    <div class="text-center text-xl font-semibold">Score: <span id="score">0</span></div>
+
+    <div class="text-center text-xl font-semibold mt-4">
+      Score: <span id="score">0</span>
+    </div>
   </div>
 
   <script>
-    // ---------- Data ----------
     const dataset = [
       {"id":1,"name":"francine smith","rank":805924},
       {"id":2,"name":"lisa simpson","rank":753355},
@@ -134,11 +142,11 @@
       {"id":100,"name":"boyfriend (friday night funkin)","rank":17977}
     ];
 
-    // ---------- State ----------
     let score = 0;
     let pair = [];
 
-    // ---------- Helpers ----------
+    const format = n => n.toLocaleString('en-US');
+
     function pickTwo() {
       const shuffled = [...dataset].sort(() => 0.5 - Math.random());
       return [shuffled[0], shuffled[1]];
@@ -167,22 +175,21 @@
       const correct = chosen === higher;
 
       const resultDiv = document.getElementById('result');
-      resultDiv.textContent = `${correct ? '✅' : '❌'} ${a.name} (${a.rank}) vs ${b.name} (${b.rank})`;
+      const chosenName = chosen.name;
+      resultDiv.innerHTML = `
+        ${chosenName} <span class="font-bold">${correct ? 'won' : 'lost'}</span><br>
+        ${correct ? '✅' : '❌'}
+      `;
       resultDiv.classList.add('fade-in');
 
       if (correct) score++;
       document.getElementById('score').textContent = score;
 
-      // Disable buttons
       document.querySelectorAll('#choices button').forEach(btn => btn.disabled = true);
-
       document.getElementById('nextBtn').classList.remove('hidden');
     }
 
-    // ---------- Init ----------
-    document.getElementById('nextBtn').onclick = () => {
-      renderRound();
-    };
+    document.getElementById('nextBtn').onclick = () => renderRound();
     renderRound();
   </script>
 </body>
